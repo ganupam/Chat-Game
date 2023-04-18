@@ -8,6 +8,8 @@
 import UIKit
 
 final class LevelSettingCollectionViewCell: UICollectionViewCell {
+    var buttonTapped: (() -> Void)!
+    
     var title: String = "" {
         didSet {
             var attributedTitle = AttributedString(self.title)
@@ -22,9 +24,9 @@ final class LevelSettingCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    private let button = {
-        let button = UIButton(type: .custom, primaryAction: UIAction { _ in
-            
+    private lazy var button = {
+        let button = UIButton(type: .custom, primaryAction: UIAction { [weak self] _ in
+            self?.buttonTapped()
         })
         var config = UIButton.Configuration.filled()
         config.cornerStyle = .capsule

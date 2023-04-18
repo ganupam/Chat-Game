@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 import Combine
+import UniformTypeIdentifiers
 
 final class GameCreatorViewController: BaseViewController {
     private enum SectionIdentifier: Hashable {
@@ -25,6 +26,13 @@ final class GameCreatorViewController: BaseViewController {
         case playerEnters
         case addNewModule
     }
+    
+    private let backgroundImageView = {
+        let backgroundImageView = UIImageView()
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundImageView.alpha = 0.2
+        return backgroundImageView
+    }()
         
     private lazy var collectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewCompositionalLayout(sectionProvider: { [weak self] index, environment in
@@ -69,8 +77,11 @@ final class GameCreatorViewController: BaseViewController {
         vc.view.translatesAutoresizingMaskIntoConstraints = false
         vc.view.backgroundColor = .clear
 
+        self.view.addSubview(self.backgroundImageView)
         self.view.addSubview(self.collectionView)
 
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[backgroundImageView]|", metrics: nil, views: ["backgroundImageView" : self.backgroundImageView]))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[backgroundImageView]|", metrics: nil, views: ["backgroundImageView" : self.backgroundImageView]))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[levelsView]|", metrics: nil, views: ["levelsView" : vc.view!]))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[collectionView]|", metrics: nil, views: ["collectionView" : self.collectionView]))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-19-[levelsView(==29)]-19-[collectionView]|", metrics: nil, views: ["levelsView" : vc.view!, "collectionView" : self.collectionView]))
@@ -88,10 +99,22 @@ final class GameCreatorViewController: BaseViewController {
     
     private func cell(for indexPath: IndexPath, itemIdentifier: ItemType) -> UICollectionViewCell {
         switch itemIdentifier {
-        case .levelSettingBackground, .levelSettingMusic:
+        case .levelSettingBackground:
             let cell = self.collectionView.dequeueConfiguredReusableCell(using: levelSettingsCellRegistration, for: indexPath, item: itemIdentifier)
-            cell.title = (itemIdentifier == .levelSettingBackground ? "Level Background" : "Level Music")
-            cell.image = UIImage(named: itemIdentifier == .levelSettingBackground ? "level_background_image" : "level_background_image")
+            cell.title = "Level Background"
+            cell.image = UIImage(named: "level_background_image")
+            cell.buttonTapped = { [weak self] in
+                self?.levelSettingBackgroundButtonTapped()
+            }
+            return cell
+            
+        case .levelSettingMusic:
+            let cell = self.collectionView.dequeueConfiguredReusableCell(using: levelSettingsCellRegistration, for: indexPath, item: itemIdentifier)
+            cell.title = "Level Music"
+            cell.image = UIImage(named: "level_background_image")
+            cell.buttonTapped = { [weak self] in
+                self?.levelSettingMusicButtonTapped()
+            }
             return cell
             
         case .module(let type):
@@ -119,12 +142,29 @@ final class GameCreatorViewController: BaseViewController {
         case .modules:
             let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(40)))
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(40)), subitem: item, count: 1)
-            //group.interItemSpacing = .fixed(12)
             let section = NSCollectionLayoutSection(group: group)
             section.interGroupSpacing = 12
             section.contentInsets = .init(top: 17, leading: 0, bottom: 0, trailing: 0)
             return section
         }
+    }
+    
+    private func levelSettingBackgroundButtonTapped() {
+        ImageVideoPicker.presentImagePicker(on: self) {
+            guard let result = $0.first?.itemProvider, result.canLoadObject(ofClass: UIImage.self) else { return }
+            
+            result.loadObject(ofClass: UIImage.self) { image, error in
+                guard let image = image as? UIImage, error == nil else { return }
+                
+                DispatchQueue.main.async {
+                    self.backgroundImageView.image = image
+                }
+            }
+        }
+    }
+    
+    private func levelSettingMusicButtonTapped() {
+        
     }
 }
 

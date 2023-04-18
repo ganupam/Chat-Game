@@ -25,6 +25,8 @@
 		418977BB29EC92AB00055D90 /* LevelSettingCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418977BA29EC92AB00055D90 /* LevelSettingCollectionViewCell.swift */; };
 		418977BD29EC967E00055D90 /* PlayerEntersCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418977BC29EC967E00055D90 /* PlayerEntersCollectionViewCell.swift */; };
 		418977BF29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418977BE29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift */; };
+		41E5A7B829EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E5A7B729EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift */; };
+		41E5A7BA29EF58CB004C3355 /* ImageVideoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E5A7B929EF58CB004C3355 /* ImageVideoPicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +50,8 @@
 		418977BA29EC92AB00055D90 /* LevelSettingCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelSettingCollectionViewCell.swift; sourceTree = "<group>"; };
 		418977BC29EC967E00055D90 /* PlayerEntersCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerEntersCollectionViewCell.swift; sourceTree = "<group>"; };
 		418977BE29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddModuleCollectionViewCell.swift; sourceTree = "<group>"; };
+		41E5A7B729EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIHostingCollectionViewCell.swift; sourceTree = "<group>"; };
+		41E5A7B929EF58CB004C3355 /* ImageVideoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageVideoPicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +87,7 @@
 				418977AA29E8CC6600055D90 /* Views */,
 				4189778D29E4D9A500055D90 /* AppDelegate.swift */,
 				4189778F29E4D9A500055D90 /* SceneDelegate.swift */,
+				41E5A7B929EF58CB004C3355 /* ImageVideoPicker.swift */,
 				418977A129E4DC8700055D90 /* View Controllers */,
 				418977B929EC928900055D90 /* Cells */,
 				418977A429E5C47900055D90 /* Extensions */,
@@ -131,6 +136,7 @@
 				418977BA29EC92AB00055D90 /* LevelSettingCollectionViewCell.swift */,
 				418977BC29EC967E00055D90 /* PlayerEntersCollectionViewCell.swift */,
 				418977BE29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift */,
+				41E5A7B729EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -214,8 +220,10 @@
 				418977BF29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift in Sources */,
 				418977B029EB463F00055D90 /* MainTabBarViewController.swift in Sources */,
 				418977AC29E8CC7200055D90 /* Views.swift in Sources */,
+				41E5A7BA29EF58CB004C3355 /* ImageVideoPicker.swift in Sources */,
 				418977A829E6236000055D90 /* GameCreatorViewController.swift in Sources */,
 				418977AE29E91C3A00055D90 /* BaseViewController.swift in Sources */,
+				41E5A7B829EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift in Sources */,
 				418977B829EB4E4100055D90 /* SpendViewController.swift in Sources */,
 				418977A329E4DCB500055D90 /* MainNavigationController.swift in Sources */,
 				418977BD29EC967E00055D90 /* PlayerEntersCollectionViewCell.swift in Sources */,
