@@ -28,7 +28,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4189778A29E4D9A500055D90 /* Chat Game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Chat Game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4189778A29E4D9A500055D90 /* Chat Game Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Chat Game Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4189778D29E4D9A500055D90 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4189778F29E4D9A500055D90 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		4189779129E4D9A500055D90 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
@@ -72,7 +72,7 @@
 		4189778B29E4D9A500055D90 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4189778A29E4D9A500055D90 /* Chat Game.app */,
+				4189778A29E4D9A500055D90 /* Chat Game Demo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -138,9 +138,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4189778929E4D9A500055D90 /* Chat Game */ = {
+		4189778929E4D9A500055D90 /* Chat Game Demo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4189779E29E4D9A600055D90 /* Build configuration list for PBXNativeTarget "Chat Game" */;
+			buildConfigurationList = 4189779E29E4D9A600055D90 /* Build configuration list for PBXNativeTarget "Chat Game Demo" */;
 			buildPhases = (
 				4189778629E4D9A500055D90 /* Sources */,
 				4189778729E4D9A500055D90 /* Frameworks */,
@@ -150,9 +150,9 @@
 			);
 			dependencies = (
 			);
-			name = "Chat Game";
+			name = "Chat Game Demo";
 			productName = "Chat Game";
-			productReference = 4189778A29E4D9A500055D90 /* Chat Game.app */;
+			productReference = 4189778A29E4D9A500055D90 /* Chat Game Demo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -183,7 +183,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4189778929E4D9A500055D90 /* Chat Game */,
+				4189778929E4D9A500055D90 /* Chat Game Demo */,
 			);
 		};
 /* End PBXProject section */
@@ -424,7 +424,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4189779E29E4D9A600055D90 /* Build configuration list for PBXNativeTarget "Chat Game" */ = {
+		4189779E29E4D9A600055D90 /* Build configuration list for PBXNativeTarget "Chat Game Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4189779F29E4D9A600055D90 /* Debug */,
