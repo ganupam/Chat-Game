@@ -64,3 +64,26 @@ struct ViewWithRoundedCornerBackground<Content: View>: View {
             )
     }
 }
+
+struct SelectableCellContent<Content: View>: View {
+    @Binding var isSelected: Bool
+    @ViewBuilder var content: () -> Content
+    
+    var body: some View {
+        ViewWithRoundedCornerBackground(cornerRadius: 7, backgroundColor: Color(.grayscale_90), borderColor: Color(isSelected ? .primary : UIColor(hex: "#404040")!)) {
+            HStack(spacing: 0) {
+                Image("selected_cell_inward_arrow")
+                    .opacity(isSelected ? 1 : 0)
+                
+                Spacer()
+                
+                content()
+                
+                Spacer()
+                
+                Image("selected_cell_outward_arrow")
+                    .opacity(isSelected ? 1 : 0)
+            }
+        }
+    }
+}

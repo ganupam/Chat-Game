@@ -27,6 +27,7 @@
 		418977BF29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418977BE29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift */; };
 		41E5A7B829EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E5A7B729EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift */; };
 		41E5A7BA29EF58CB004C3355 /* ImageVideoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E5A7B929EF58CB004C3355 /* ImageVideoPicker.swift */; };
+		41E5A7BC29F5D961004C3355 /* TextModuleCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E5A7BB29F5D961004C3355 /* TextModuleCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +53,7 @@
 		418977BE29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddModuleCollectionViewCell.swift; sourceTree = "<group>"; };
 		41E5A7B729EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIHostingCollectionViewCell.swift; sourceTree = "<group>"; };
 		41E5A7B929EF58CB004C3355 /* ImageVideoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageVideoPicker.swift; sourceTree = "<group>"; };
+		41E5A7BB29F5D961004C3355 /* TextModuleCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextModuleCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,11 +86,11 @@
 		4189778C29E4D9A500055D90 /* Chat Game */ = {
 			isa = PBXGroup;
 			children = (
-				418977AA29E8CC6600055D90 /* Views */,
 				4189778D29E4D9A500055D90 /* AppDelegate.swift */,
 				4189778F29E4D9A500055D90 /* SceneDelegate.swift */,
 				41E5A7B929EF58CB004C3355 /* ImageVideoPicker.swift */,
 				418977A129E4DC8700055D90 /* View Controllers */,
+				418977AA29E8CC6600055D90 /* Views */,
 				418977B929EC928900055D90 /* Cells */,
 				418977A429E5C47900055D90 /* Extensions */,
 				4189779629E4D9A600055D90 /* Assets.xcassets */,
@@ -134,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				418977BA29EC92AB00055D90 /* LevelSettingCollectionViewCell.swift */,
+				41E5A7BB29F5D961004C3355 /* TextModuleCollectionViewCell.swift */,
 				418977BC29EC967E00055D90 /* PlayerEntersCollectionViewCell.swift */,
 				418977BE29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift */,
 				41E5A7B729EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift */,
@@ -219,6 +222,7 @@
 				418977B429EB4D3B00055D90 /* BrowseViewController.swift in Sources */,
 				418977BF29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift in Sources */,
 				418977B029EB463F00055D90 /* MainTabBarViewController.swift in Sources */,
+				41E5A7BC29F5D961004C3355 /* TextModuleCollectionViewCell.swift in Sources */,
 				418977AC29E8CC7200055D90 /* Views.swift in Sources */,
 				41E5A7BA29EF58CB004C3355 /* ImageVideoPicker.swift in Sources */,
 				418977A829E6236000055D90 /* GameCreatorViewController.swift in Sources */,

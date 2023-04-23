@@ -8,7 +8,10 @@
 import UIKit
 import SwiftUI
 
-class SwiftUIHostingCollectionViewCell<Content: View>: UICollectionViewCell {
+class SwiftUIHostingCollectionViewCell<Content: View>: UICollectionViewCell, ObservableObject {
+    @Published var isSelectable = false
+    @Published var hasBeenSelected = false
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -21,18 +24,36 @@ class SwiftUIHostingCollectionViewCell<Content: View>: UICollectionViewCell {
     
     var swiftUIContentView: Content? {
         didSet {
+            self.contentView.viewWithTag(1)?.removeFromSuperview()
+            
             guard let content = swiftUIContentView else {
-                self.contentView.viewWithTag(1)?.removeFromSuperview()
                 return
             }
-            
-            let vc = UIHostingController(rootView: content)
+            let vc = UIHostingController(rootView: CellContent(cell: self) {
+                content
+            })
             vc.view.backgroundColor = .clear
             vc.view.translatesAutoresizingMaskIntoConstraints = false
             vc.view.tag = 1
             self.contentView.addSubview(vc.view)
             self.contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|", metrics: nil, views: ["view" : vc.view as Any]))
             self.contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|", metrics: nil, views: ["view" : vc.view as Any]))
+        }
+    }
+    
+    private struct CellContent<Content: View>: View {
+        @ObservedObject var cell: SwiftUIHostingCollectionViewCell
+        @ViewBuilder var content: () -> Content
+        
+        var body: some View {
+            if cell.isSelectable {
+                SelectableCellContent(isSelected: $cell.hasBeenSelected) {
+                    content()
+                }
+                .padding(.horizontal, 16)
+            } else {
+                content()
+            }
         }
     }
 }
