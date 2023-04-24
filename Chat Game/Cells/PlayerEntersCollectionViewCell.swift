@@ -27,7 +27,7 @@ final class PlayerEntersCollectionViewCell: SwiftUIHostingCollectionViewCell<Pla
         }()
         
         var body: some View {
-            ViewWithRoundedCornerBackground(cornerRadius: 7, backgroundColor: Color(.grayscale_80)) {
+            ViewWithRoundedCornerBackground(cornerRadius: 7, backgroundColor: Asset.Colors.Grayscale._80.swiftUIColor) {
                 HStack {
                     Text(AttributedString(text))
                         .font(.system(size: 14))

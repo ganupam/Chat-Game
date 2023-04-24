@@ -13,7 +13,7 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
         let textView = UITextView(frame: .zero)
         textView.backgroundColor = .clear
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.textColor = .grayscale_10
+        textView.textColor = Asset.Colors.Grayscale._10.color
         textView.font = .systemFont(ofSize: 14)
         let view = UIHostingController(rootView: InputAccessoryView()).view!
         view.bounds.size.height = view.intrinsicContentSize.height
@@ -60,17 +60,17 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
     fileprivate struct InputAccessoryView: View {
         var body: some View {
             VStack(spacing: 0) {
-                Color.grayscale_70
+                Asset.Colors.Grayscale._70.swiftUIColor
                     .frame(height: 1)
                 
                 ScrollView {
                     HStack(spacing: 0) {
-                        ButtonWithRoundedCornerBackground(cornerRadius: 15, backgroundColor: .clear, borderColor: .grayscale_70, selectedStatebackgroundColor: .primary, selectedStateBorderColor: .primary, isSelected: .constant(true)) {
+                        ButtonWithRoundedCornerBackground(cornerRadius: 15, backgroundColor: .clear, borderColor: Asset.Colors.Grayscale._70.swiftUIColor, selectedStatebackgroundColor: Asset.Colors.primary.swiftUIColor, selectedStateBorderColor: Asset.Colors.primary.swiftUIColor, isSelected: .constant(true)) {
                             
                         } content: {
                             Text("Narrator")
                                 .font(.system(size: 12))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Asset.Colors.secondary.swiftUIColor)
                                 .padding(.horizontal, 10)
                         }
                         .frame(height: 30)
@@ -115,18 +115,18 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
                         
                     } label: {
                         Text("Save")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Asset.Colors.secondary.swiftUIColor)
                             .font(.system(size: 15, weight: .bold))
                             .frame(width: 87, height: 34)
                     }
-                    .background(Color.primary)
+                    .background(Asset.Colors.primary.swiftUIColor)
                     .cornerRadius(10)
                 }
                 .padding(.horizontal, 10)
                 .padding(.top, 5)
                 .padding(.bottom, 5)
             }
-            .background(Color.grayscale_90)
+            .background(Asset.Colors.Grayscale._90.swiftUIColor)
         }
     }
 }

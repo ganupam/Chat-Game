@@ -70,7 +70,7 @@ struct SelectableCellContent<Content: View>: View {
     @ViewBuilder var content: () -> Content
     
     var body: some View {
-        ViewWithRoundedCornerBackground(cornerRadius: 7, backgroundColor: Color(.grayscale_90), borderColor: Color(isSelected ? .primary : UIColor(hex: "#404040")!)) {
+        ViewWithRoundedCornerBackground(cornerRadius: 7, backgroundColor: Asset.Colors.Grayscale._90.swiftUIColor, borderColor: isSelected ? Asset.Colors.primary.swiftUIColor : Color(hex: "#404040")!) {
             HStack(spacing: 0) {
                 Image("selected_cell_inward_arrow")
                     .opacity(isSelected ? 1 : 0)

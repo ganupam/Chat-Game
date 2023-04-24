@@ -31,8 +31,8 @@ final class LevelSettingCollectionViewCell: UICollectionViewCell {
         var config = UIButton.Configuration.filled()
         config.cornerStyle = .capsule
         config.imagePadding = 5
-        config.baseForegroundColor = .grayscale_10
-        button.tintColor = .grayscale_80
+        config.baseForegroundColor = Asset.Colors.Grayscale._10.color
+        button.tintColor = Asset.Colors.Grayscale._80.color
         button.configuration = config
         button.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return button

@@ -17,7 +17,7 @@ class ImageVideoPicker {
         config.filter = .images
         let picker = PHPickerViewController(configuration: config)
         picker.overrideUserInterfaceStyle = .dark
-        picker.view.tintColor = .primary
+        picker.view.tintColor = Asset.Colors.primary.color
         Self.delegate = ImageVideoPickerDelegate() { results in
             picker.dismiss(animated: true) {
                 completionHandler(results)

@@ -30,10 +30,10 @@ final class AddModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<AddMod
                 
                 Image(systemName: "plus")
                     .padding(.trailing, 12)
-                    .foregroundColor(Color(.primary))
+                    .foregroundColor(Asset.Colors.primary.swiftUIColor)
                 
                 Text("Add Module")
-                    .foregroundColor(Color(cell.hasBeenSelected ? .primary : .grayscale_40))
+                    .foregroundColor(cell.hasBeenSelected ? Asset.Colors.primary.swiftUIColor : Asset.Colors.Grayscale._40.swiftUIColor)
                     .font(.system(size: 14))
                 
                 Spacer()

@@ -12,7 +12,7 @@ final class MainNavigationController: UINavigationController {
         super.viewDidLoad()
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor.grayscale_80
+        appearance.backgroundColor = Asset.Colors.Grayscale._80.color
         appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         let backIndicatorImage = UIImage(named: "nav_back_button")?.withRenderingMode(.alwaysOriginal).withAlignmentRectInsets(UIEdgeInsets(top: 0, left: -20, bottom: 0, right: 0))
         appearance.setBackIndicatorImage(backIndicatorImage, transitionMaskImage: backIndicatorImage)

@@ -199,7 +199,7 @@ final class GameCreatorViewController: BaseViewController {
     
     private func toolbarButtonTapped(_ buttonType: AddModuleToolbar.ToolbarButton) {
         if buttonType == .text {
-            let newTextModuleType = ItemType.module(.text(UUID(), TextModuleModel(text: NSAttributedString(string: "Narrator: ", attributes: [.foregroundColor : UIColor.grayscale_10]))))
+            let newTextModuleType = ItemType.module(.text(UUID(), TextModuleModel(text: NSAttributedString(string: "Narrator: ", attributes: [.foregroundColor : Asset.Colors.Grayscale._10.color]))))
             self.selectedModule = newTextModuleType
             self.showHideToolbar()
             
@@ -242,7 +242,7 @@ extension GameCreatorViewController {
                         } label: {
                             Text("level \(index + 1)")
                                 .font(.system(size: 11))
-                                .foregroundColor(Color(.grayscale_10))
+                                .foregroundColor(Asset.Colors.Grayscale._10.swiftUIColor)
                         }
                         .frame(width: 66)
                         .background(Image(levelSelected == index ? "level_selected" : "level_unselected"))

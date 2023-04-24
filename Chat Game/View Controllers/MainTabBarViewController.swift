@@ -13,13 +13,13 @@ final class MainTabBarViewController: UITabBarController {
 
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .header_background
+        appearance.backgroundColor = Asset.Colors.Utility.headerBackground.color
 
         let itemAppearance = UITabBarItemAppearance(style: .stacked)
-        itemAppearance.normal.iconColor = .grayscale_20
-        itemAppearance.normal.titleTextAttributes = [.foregroundColor : UIColor.grayscale_20]
-        itemAppearance.selected.iconColor = .primary
-        itemAppearance.selected.titleTextAttributes = [.foregroundColor : UIColor.primary]
+        itemAppearance.normal.iconColor = Asset.Colors.Grayscale._20.color
+        itemAppearance.normal.titleTextAttributes = [.foregroundColor : Asset.Colors.Grayscale._20.color]
+        itemAppearance.selected.iconColor = Asset.Colors.primary.color
+        itemAppearance.selected.titleTextAttributes = [.foregroundColor : Asset.Colors.primary.color]
         appearance.stackedLayoutAppearance = itemAppearance
         self.tabBar.standardAppearance = appearance
         //self.tabBar.scrollEdgeAppearance = appearance
