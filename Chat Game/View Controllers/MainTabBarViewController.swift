@@ -24,7 +24,7 @@ final class MainTabBarViewController: UITabBarController {
         self.tabBar.standardAppearance = appearance
         //self.tabBar.scrollEdgeAppearance = appearance
         
-        let createTab = MainNavigationController(rootViewController: GameCreatorViewController())
+        let createTab = MainNavigationController(rootViewController: GameEditorViewController())
         self.viewControllers = [FavoritesViewController(), BrowseViewController(), createTab, SpendViewController(), AccountViewController()]
         self.selectedIndex = 2
     }

@@ -9,13 +9,15 @@ import UIKit
 import SwiftUI
 
 final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextModuleCollectionViewCell.CellContent> {
-    private let textView = {
+    private lazy var textView = {
         let textView = UITextView(frame: .zero)
         textView.backgroundColor = .clear
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.textColor = Asset.Colors.Grayscale._10.color
         textView.font = .systemFont(ofSize: 14)
-        let view = UIHostingController(rootView: InputAccessoryView()).view!
+        let view = UIHostingController(rootView: InputAccessoryView() { [weak self] in
+            self?.saveButtonTapped()
+        }).view!
         view.bounds.size.height = view.intrinsicContentSize.height
         view.backgroundColor = .clear
         textView.inputAccessoryView = view
@@ -39,13 +41,25 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
         fatalError("init(coder:) has not been implemented")
     }
     
-    var text: NSAttributedString? {
-        get {
-            textView.attributedText
+    var textModule: TextModule! {
+        didSet {
+            let attribString = NSMutableAttributedString(string: (textModule.character?.name ?? "") + ": ", attributes: [.foregroundColor : Asset.Colors.Grayscale._10.color])
+            attribString.append(textModule.text ?? NSAttributedString())
+            textView.attributedText = attribString
         }
-        
-        set {
-            textView.attributedText = newValue
+    }
+    
+    private func saveButtonTapped() {
+        var attribString = AttributedString(textView.attributedText)
+        if let range = attribString.range(of: textModule.character!.name! + ": ") {
+            attribString.replaceSubrange(range, with: AttributedString())
+        }
+        textModule.text = NSAttributedString(attribString)
+        do {
+            try textModule.managedObjectContext?.save()
+        }
+        catch {
+            preconditionFailure("Failed to save text module text")
         }
     }
     
@@ -58,6 +72,8 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
     }
     
     fileprivate struct InputAccessoryView: View {
+        let saveButtonTapped: () -> Void
+        
         var body: some View {
             VStack(spacing: 0) {
                 Asset.Colors.Grayscale._70.swiftUIColor
@@ -111,9 +127,7 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
 
                     Spacer()
                     
-                    Button {
-                        
-                    } label: {
+                    Button(action: saveButtonTapped) {
                         Text("Save")
                             .foregroundColor(Asset.Colors.secondary.swiftUIColor)
                             .font(.system(size: 15, weight: .bold))

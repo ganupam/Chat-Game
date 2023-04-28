@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22E261" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Character" representedClassName="Character" syncable="YES" codeGenerationType="class">
+        <attribute name="name" attributeType="String" minValueString="1"/>
+    </entity>
+    <entity name="Game" representedClassName="Game" syncable="YES" codeGenerationType="class">
+        <attribute name="title" attributeType="String" minValueString="1" spotlightIndexingEnabled="YES"/>
+        <relationship name="characters" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Character"/>
+        <relationship name="levels" toMany="YES" minCount="1" deletionRule="Cascade" ordered="YES" destinationEntity="Level"/>
+    </entity>
+    <entity name="Level" representedClassName="Level" syncable="YES" codeGenerationType="class">
+        <relationship name="modules" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Module"/>
+    </entity>
+    <entity name="Module" representedClassName="Module" isAbstract="YES" syncable="YES" codeGenerationType="class"/>
+    <entity name="TextModule" representedClassName="TextModule" parentEntity="Module" syncable="YES" codeGenerationType="class">
+        <attribute name="text" optional="YES" attributeType="Transformable" valueTransformerName="NSAttributedStringTransformer" customClassName="NSAttributedString"/>
+        <relationship name="character" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Character"/>
+    </entity>
+</model>

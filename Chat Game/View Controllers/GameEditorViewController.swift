@@ -1,5 +1,5 @@
 //
-//  GameCreatorViewController.swift
+//  GameEditorViewController.swift
 //  Chat Game
 //
 //  Created by Anupam Godbole on 4/11/23.
@@ -10,7 +10,7 @@ import SwiftUI
 import Combine
 import UniformTypeIdentifiers
 
-final class GameCreatorViewController: BaseViewController {
+final class GameEditorViewController: BaseViewController {
     private enum SectionIdentifier: Hashable {
         case levelSettings
         case modules
@@ -25,11 +25,7 @@ final class GameCreatorViewController: BaseViewController {
     private enum ModuleType: Hashable {
         case playerEnters
         case addNewModule
-        case text(UUID, TextModuleModel)
-    }
-    
-    private struct TextModuleModel: Hashable {
-        let text: NSAttributedString?
+        case text(TextModule)
     }
     
     private let backgroundImageView = {
@@ -38,7 +34,7 @@ final class GameCreatorViewController: BaseViewController {
         backgroundImageView.alpha = 0.2
         return backgroundImageView
     }()
-        
+    
     private lazy var collectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewCompositionalLayout(sectionProvider: { [weak self] index, environment in
             self?.section(for: index)
@@ -54,12 +50,13 @@ final class GameCreatorViewController: BaseViewController {
         self?.cell(for: indexPath, itemIdentifier: itemIdentifier)
     }
     
+    private var notificationToken: NotificationToken?
+    
     private let levelSettingsCellRegistration = UICollectionView.CellRegistration<LevelSettingCollectionViewCell, ItemType> {_, _, _ in }
     private let playerEntersCellRegistration = UICollectionView.CellRegistration<PlayerEntersCollectionViewCell, ItemType> {_, _, _ in }
     private let addModuleCellRegistration = UICollectionView.CellRegistration<AddModuleCollectionViewCell, ItemType> {_, _, _ in }
     private let textModuleCellRegistration = UICollectionView.CellRegistration<TextModuleCollectionViewCell, ItemType> {_, _, _ in }
-
-    private let levelsViewModel = Levels.ViewModel(levels: 2)
+    
     private var selectedLevel: Int = 0
     private var selectedModule: ItemType?
     private lazy var addModuleToolbar = {
@@ -71,6 +68,18 @@ final class GameCreatorViewController: BaseViewController {
         toolbar.view.backgroundColor = .clear
         return toolbar.view!
     }()
+    
+    private lazy var createNewGameVC: UIHostingController<GameEditorViewController.CreateNewGame>? = UIHostingController(rootView: CreateNewGame() { [weak self] in
+        self?.createNewGame()
+    })
+    
+    private(set) var game: Game!
+    
+    init(game: Game?) {
+        self.game = game
+        
+        super.init(nibName: nil, bundle: nil)
+    }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -86,18 +95,59 @@ final class GameCreatorViewController: BaseViewController {
                 
         self.title = "Create"
         
-        let vc = UIHostingController(rootView: Levels(selectedLevel: Binding(get: {
+        if self.game == nil {
+            let vc = createNewGameVC!
+            self.view.addSubview(vc.view)
+            vc.view.translatesAutoresizingMaskIntoConstraints = false
+            vc.view.backgroundColor = .clear
+            self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[createNewGameView]|", metrics: nil, views: ["createNewGameView" : vc.view!]))
+            self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[createNewGameView]|", metrics: nil, views: ["createNewGameView" : vc.view!]))
+        } else {
+            self.initializeGameEditor()
+        }
+    }
+    
+    private func createNewGame() {
+        let alert = UIAlertController(title: "Game title", message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        let confirmAction = UIAlertAction(title: "Create", style: .default) { [weak alert, weak self] _ in
+            let title = alert?.textFields?.first?.text?.trimmingCharacters(in: .whitespaces) ?? ""
+            self?.game = DataManager.shared.createNewGame(title)
+            self?.switchToGameEditorMode()
+        }
+        confirmAction.isEnabled = false
+        alert.addAction(confirmAction)
+        alert.addTextField {
+            $0.autocapitalizationType = .words
+        }
+        self.present(alert, animated: true)
+        self.notificationToken = NotificationCenter.default.addTokenizedObserver(forName: UITextField.textDidChangeNotification, object: alert.textFields?.first, queue: .main) { _ in
+            confirmAction.isEnabled = !(alert.textFields?.first?.text?.trimmingCharacters(in: .whitespaces).isEmpty ?? true)
+        }
+    }
+    
+    private func switchToGameEditorMode() {
+        self.createNewGameVC?.view.removeFromSuperview()
+        self.createNewGameVC = nil
+        self.initializeGameEditor()
+    }
+    
+    private func initializeGameEditor() {
+        self.title = self.game.title
+        self.tabBarItem = UITabBarItem(title: "Create", image: UIImage(named: "create_game_tab"), selectedImage: nil)
+
+        let vc = UIHostingController(rootView: Levels(game: self.game, selectedLevel: Binding(get: {
             self.selectedLevel
         }, set: {
             self.selectedLevel = $0
-        }), vm: levelsViewModel))
+        })))
         self.view.addSubview(vc.view)
         vc.view.translatesAutoresizingMaskIntoConstraints = false
         vc.view.backgroundColor = .clear
-
+        
         self.view.addSubview(self.backgroundImageView)
         self.view.addSubview(self.collectionView)
-
+        
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[backgroundImageView]|", metrics: nil, views: ["backgroundImageView" : self.backgroundImageView]))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[backgroundImageView]|", metrics: nil, views: ["backgroundImageView" : self.backgroundImageView]))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[levelsView]|", metrics: nil, views: ["levelsView" : vc.view!]))
@@ -110,11 +160,11 @@ final class GameCreatorViewController: BaseViewController {
             self.addModuleToolbar.heightAnchor.constraint(equalToConstant: 54),
             self.addModuleToolbar.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -10)
         ])
-
-        self.loadDataSource()
+        
+        self.initializeDataSource()
     }
     
-    private func loadDataSource() {
+    private func initializeDataSource() {
         var snapshot = NSDiffableDataSourceSnapshot<SectionIdentifier, ItemType>()
         snapshot.appendSections([.levelSettings, .modules])
         snapshot.appendItems([.levelSettingBackground, .levelSettingMusic], toSection: .levelSettings)
@@ -150,9 +200,9 @@ final class GameCreatorViewController: BaseViewController {
             case .addNewModule:
                 return self.collectionView.dequeueConfiguredReusableCell(using: addModuleCellRegistration, for: indexPath, item: itemIdentifier)
                 
-            case .text(_, let model):
+            case .text(let textModule):
                 let cell = self.collectionView.dequeueConfiguredReusableCell(using: textModuleCellRegistration, for: indexPath, item: itemIdentifier)
-                cell.text = model.text
+                cell.textModule = textModule
                 return cell
             }
         }
@@ -199,7 +249,13 @@ final class GameCreatorViewController: BaseViewController {
     
     private func toolbarButtonTapped(_ buttonType: AddModuleToolbar.ToolbarButton) {
         if buttonType == .text {
-            let newTextModuleType = ItemType.module(.text(UUID(), TextModuleModel(text: NSAttributedString(string: "Narrator: ", attributes: [.foregroundColor : Asset.Colors.Grayscale._10.color]))))
+            guard let level = (self.game.levels?.array as? [Level])?[self.selectedLevel] else {
+                preconditionFailure("Atleast 1 level should exist")
+            }
+            
+            let textModule = DataManager.shared.addTextModule(to: level)
+            
+            let newTextModuleType = ItemType.module(.text(textModule))
             self.selectedModule = newTextModuleType
             self.showHideToolbar()
             
@@ -216,29 +272,49 @@ final class GameCreatorViewController: BaseViewController {
     }
 }
 
-extension GameCreatorViewController {
-    private struct Levels: View {
-        final class ViewModel: ObservableObject {
-            @Published var levels: Int
-            
-            init(levels: Int) {
-                self.levels = levels
+extension GameEditorViewController {
+    private struct CreateNewGame: View {
+        let createNewGameButtonTapped: () -> Void
+        
+        var body: some View {
+            VStack(spacing: 0) {
+                Spacer()
+                
+                Text("No games")
+                    .foregroundColor(Asset.Colors.Grayscale._10.swiftUIColor)
+                    .font(.system(size: 16, weight: .bold))
+                    .padding(.bottom, 12)
+
+                Text("Tap “+” to build your first game")
+                    .foregroundColor(Asset.Colors.Grayscale._50.swiftUIColor)
+                    .font(.system(size: 16))
+                    .padding(.bottom, 39)
+                
+                Button(action: createNewGameButtonTapped) {
+                    Text("Create Your First Game")
+                        .foregroundColor(Asset.Colors.Grayscale._100.swiftUIColor)
+                        .font(.system(size: 15, weight: .heavy))
+                        .padding(.vertical, 16)
+                        .padding(.horizontal, 56)
+                }
+                .background(Image("level_selected").resizable())
+
+                Spacer()
             }
         }
-
+    }
+    
+    private struct Levels: View {
+        @ObservedObject var game: Game
         @Binding var selectedLevel: Int
         @State private var levelSelected = 0
-        @ObservedObject private(set) var vm: ViewModel
-
+            
         var body: some View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 4) {
-                    ForEach(0 ..< vm.levels, id: \.self) { index in
+                    ForEach(0 ..< (game.levels?.count ?? 0), id: \.self) { index in
                         Button {
-                            withAnimation(.linear(duration: 0.1)) {
-                                levelSelected = index
-                            }
-                            selectedLevel = index
+                            selectLevel(index)
                         } label: {
                             Text("level \(index + 1)")
                                 .font(.system(size: 11))
@@ -249,7 +325,8 @@ extension GameCreatorViewController {
                     }
                     
                     ButtonWithRoundedCornerBackground(cornerRadius: 5, backgroundColor: Color(UIColor(hex: "#262522")!), borderColor: Color(UIColor(hex: "#262522")!), selectedStatebackgroundColor: .white, selectedStateBorderColor: .white, isSelected: .constant(false)) {
-                        
+                        DataManager.shared.addLevel(to: game)
+                        selectLevel((game.levels?.count ?? 0) - 1)
                     } content: {
                         Image("add_level")
                             .frame(width: 66)
@@ -257,6 +334,13 @@ extension GameCreatorViewController {
                 }
                 .padding(.horizontal, 12)
             }
+        }
+        
+        private func selectLevel(_ index: Int) {
+            withAnimation(.linear(duration: 0.1)) {
+                levelSelected = index
+            }
+            selectedLevel = index
         }
     }
     
@@ -336,7 +420,7 @@ extension GameCreatorViewController {
     }
 }
 
-extension GameCreatorViewController: UICollectionViewDelegate {
+extension GameEditorViewController: UICollectionViewDelegate {
     private func itemIdentifier(from indexPath: IndexPath) -> ItemType? {
         let snapshot = self.collectionViewDataSource.snapshot()
         guard snapshot.sectionIdentifiers[indexPath.section] == .modules else { return nil }

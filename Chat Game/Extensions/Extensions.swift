@@ -9,28 +9,17 @@ import Foundation
 import UIKit
 import SwiftUI
 
-//private enum Path: String {
-//    case colors
-//    case grayscale
-//    case utility
-//}
-
 extension UIColor {
-//    fileprivate convenience init?(paths: [Path], colorName: String) {
-//        var path = (paths.reduce("") { partialResult, partialPath in
-//            partialResult + (!partialResult.isEmpty ? "/" : "") + partialPath.rawValue
-//        })
-//        path +=  (!path.isEmpty ? "/" : "") + colorName
-//        self.init(named: path)
-//    }
-//
     convenience init?(hex: String) {
         let r, g, b, a: CGFloat
-
-        guard hex.hasPrefix("#") else { return nil }
         
-        let start = hex.index(hex.startIndex, offsetBy: 1)
-        let hexColor = String(hex[start...])
+        let hexColor: String
+        if hex.hasPrefix("#") {
+            let start = hex.index(hex.startIndex, offsetBy: 1)
+            hexColor = String(hex[start...])
+        } else {
+            hexColor = hex
+        }
         
         guard hexColor.count == 8 || hexColor.count == 6 else { return nil }
         
@@ -53,34 +42,64 @@ extension UIColor {
         
         self.init(red: r, green: g, blue: b, alpha: a)
     }
-//
-//    static let grayscale_40 = UIColor(paths: [Path.colors, Path.grayscale], colorName: "40")!
-//    static let grayscale_90 = UIColor(paths: [Path.colors, Path.grayscale], colorName: "90")!
-//    static let grayscale_80 = UIColor(paths: [Path.colors, Path.grayscale], colorName: "80")!
-//    static let grayscale_70 = UIColor(paths: [Path.colors, Path.grayscale], colorName: "70")!
-//    static let grayscale_60 = UIColor(paths: [Path.colors, Path.grayscale], colorName: "60")!
-//    static let grayscale_10 = UIColor(paths: [Path.colors, Path.grayscale], colorName: "10")!
-//    static let grayscale_20 = UIColor(paths: [Path.colors, Path.grayscale], colorName: "20")!
-//    static let header_background = UIColor(paths: [Path.colors, Path.utility], colorName: "header_background")!
-//    static let primary = UIColor(paths: [Path.colors], colorName: "primary")!
-//    static let secondary = UIColor(paths: [Path.colors], colorName: "secondary")!
 }
 
 extension Color {
-//    static let grayscale_40 = Color(uiColor: UIColor(paths: [Path.colors, Path.grayscale], colorName: "40")!)
-//    static let grayscale_90 = Color(UIColor(paths: [Path.colors, Path.grayscale], colorName: "90")!)
-//    static let grayscale_80 = Color(UIColor(paths: [Path.colors, Path.grayscale], colorName: "80")!)
-//    static let grayscale_70 = Color(UIColor(paths: [Path.colors, Path.grayscale], colorName: "70")!)
-//    static let grayscale_10 = Color(UIColor(paths: [Path.colors, Path.grayscale], colorName: "10")!)
-//    static let grayscale_20 = Color(UIColor(paths: [Path.colors, Path.grayscale], colorName: "20")!)
-//    static let header_background = Color(UIColor(paths: [Path.colors, Path.utility], colorName: "header_background")!)
-//    static let primary = Color(UIColor(paths: [Path.colors], colorName: "primary")!)
-//    static let secondary = Color(UIColor(paths: [Path.colors], colorName: "secondary")!)
-//    static let grayscale_60 = Color(UIColor(paths: [Path.colors, Path.grayscale], colorName: "60")!)
-
     init?(hex: String) {
         guard let uiColor = UIColor(hex: hex) else { return nil }
         
         self.init(uiColor: uiColor)
+    }
+}
+
+final class NotificationToken: NSObject {
+    private let token: Any
+
+    init(token: Any) {
+        self.token = token
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(token)
+    }
+    
+    func store(in array: inout [NotificationToken]) {
+        array.append(self)
+    }
+    
+    func unregister() {
+        NotificationCenter.default.removeObserver(token)
+    }
+}
+
+extension NotificationCenter {
+    /// NotificationCenter.addObserver(forName:object:queue:using:) doesn't unregister itself when the object is deallocated which cause the block to be leaked/not deallocated.
+    @inline(__always) func addTokenizedObserver(forName name: NSNotification.Name?, object obj: Any?, queue: OperationQueue?, using block: @escaping (Notification) -> Void) -> NotificationToken {
+        let token = addObserver(forName: name, object: obj, queue: queue, using: block)
+        return NotificationToken(token: token)
+    }
+}
+
+extension NSKeyedUnarchiver {
+    static func unsecureUnarchivedObject<DecodedObjectType>(ofClass cls: DecodedObjectType.Type, from data: Data) throws -> DecodedObjectType? where DecodedObjectType : NSObject, DecodedObjectType : NSCoding {
+        do {
+            let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
+            unarchiver.requiresSecureCoding = false
+            let object = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? DecodedObjectType
+            return object
+        }
+        catch {
+            throw error
+        }
+    }
+    
+    static func unsecureUnarchivedObject<DecodedObjectType>(ofClass cls: DecodedObjectType.Type, from filename: String) throws -> DecodedObjectType? where DecodedObjectType : NSObject, DecodedObjectType : NSCoding {
+        do {
+            let data = try Data(contentsOf: URL(fileURLWithPath: filename))
+            return try self.unsecureUnarchivedObject(ofClass: cls, from: data)
+        }
+        catch let error {
+            throw error
+        }
     }
 }
