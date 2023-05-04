@@ -22,9 +22,8 @@ final class MainTabBarViewController: UITabBarController {
         itemAppearance.selected.titleTextAttributes = [.foregroundColor : Asset.Colors.primary.color]
         appearance.stackedLayoutAppearance = itemAppearance
         self.tabBar.standardAppearance = appearance
-        //self.tabBar.scrollEdgeAppearance = appearance
         
-        let createTab = MainNavigationController(rootViewController: GameEditorViewController())
+        let createTab = MainNavigationController(rootViewController: CreateGamesViewController())
         self.viewControllers = [FavoritesViewController(), BrowseViewController(), createTab, SpendViewController(), AccountViewController()]
         self.selectedIndex = 2
     }

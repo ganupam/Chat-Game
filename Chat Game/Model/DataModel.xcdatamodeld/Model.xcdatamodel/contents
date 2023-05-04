@@ -5,11 +5,13 @@
         <relationship name="game" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="characters" inverseEntity="Game"/>
     </entity>
     <entity name="Game" representedClassName="Game" syncable="YES" codeGenerationType="class">
+        <attribute name="creationDate" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="title" attributeType="String" minValueString="1" spotlightIndexingEnabled="YES"/>
         <relationship name="characters" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Character" inverseName="game" inverseEntity="Character"/>
         <relationship name="levels" toMany="YES" minCount="1" deletionRule="Cascade" ordered="YES" destinationEntity="Level" inverseName="game" inverseEntity="Level"/>
     </entity>
     <entity name="Level" representedClassName="Level" syncable="YES" codeGenerationType="class">
+        <attribute name="backgroundImage" optional="YES" attributeType="Binary"/>
         <relationship name="game" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="levels" inverseEntity="Game"/>
         <relationship name="modules" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Module" inverseName="level" inverseEntity="Module"/>
     </entity>

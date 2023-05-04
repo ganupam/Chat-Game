@@ -33,9 +33,14 @@ final class DataManager: NSObject {
         
     }
     
+    var viewContext: NSManagedObjectContext {
+        self.persistentContainer.viewContext
+    }
+    
     func createNewGame(_ title: String) -> Game {
         let game = Game(context: self.persistentContainer.viewContext)
         game.title = title
+        game.creationDate = Date()
         let level = Level(context: self.persistentContainer.viewContext)
         game.addToLevels(level)
         do {
@@ -95,5 +100,15 @@ final class DataManager: NSObject {
             preconditionFailure("Failed to add text module.")
         }
         return character
+    }
+    
+    func setBackgroundImage(_ data: Data, for level: Level) {
+        level.backgroundImage = data
+        do {
+            try level.managedObjectContext?.save()
+        }
+        catch {
+            preconditionFailure("Failed to set background image")
+        }
     }
 }
