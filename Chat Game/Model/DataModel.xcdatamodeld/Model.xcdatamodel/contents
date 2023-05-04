@@ -2,16 +2,20 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22E261" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Character" representedClassName="Character" syncable="YES" codeGenerationType="class">
         <attribute name="name" attributeType="String" minValueString="1"/>
+        <relationship name="game" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="characters" inverseEntity="Game"/>
     </entity>
     <entity name="Game" representedClassName="Game" syncable="YES" codeGenerationType="class">
         <attribute name="title" attributeType="String" minValueString="1" spotlightIndexingEnabled="YES"/>
-        <relationship name="characters" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Character"/>
-        <relationship name="levels" toMany="YES" minCount="1" deletionRule="Cascade" ordered="YES" destinationEntity="Level"/>
+        <relationship name="characters" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Character" inverseName="game" inverseEntity="Character"/>
+        <relationship name="levels" toMany="YES" minCount="1" deletionRule="Cascade" ordered="YES" destinationEntity="Level" inverseName="game" inverseEntity="Level"/>
     </entity>
     <entity name="Level" representedClassName="Level" syncable="YES" codeGenerationType="class">
-        <relationship name="modules" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Module"/>
+        <relationship name="game" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="levels" inverseEntity="Game"/>
+        <relationship name="modules" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Module" inverseName="level" inverseEntity="Module"/>
     </entity>
-    <entity name="Module" representedClassName="Module" isAbstract="YES" syncable="YES" codeGenerationType="class"/>
+    <entity name="Module" representedClassName="Module" isAbstract="YES" syncable="YES" codeGenerationType="class">
+        <relationship name="level" maxCount="1" deletionRule="Nullify" destinationEntity="Level" inverseName="modules" inverseEntity="Level"/>
+    </entity>
     <entity name="TextModule" representedClassName="TextModule" parentEntity="Module" syncable="YES" codeGenerationType="class">
         <attribute name="text" optional="YES" attributeType="Transformable" valueTransformerName="NSAttributedStringTransformer" customClassName="NSAttributedString"/>
         <relationship name="character" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Character"/>

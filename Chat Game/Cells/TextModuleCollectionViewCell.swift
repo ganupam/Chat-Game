@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import Combine
 
 final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextModuleCollectionViewCell.CellContent> {
     private lazy var textView = {
@@ -15,14 +16,20 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.textColor = Asset.Colors.Grayscale._10.color
         textView.font = .systemFont(ofSize: 14)
-        let view = UIHostingController(rootView: InputAccessoryView() { [weak self] in
-            self?.saveButtonTapped()
-        }).view!
-        view.bounds.size.height = view.intrinsicContentSize.height
-        view.backgroundColor = .clear
-        textView.inputAccessoryView = view
+        textView.isUserInteractionEnabled = false
         return textView
     }()
+    
+    override var hasBeenSelected: Bool {
+        didSet {
+            self.textView.isUserInteractionEnabled = self.hasBeenSelected
+        }
+    }
+    
+    var presentingViewController: UIViewController!
+    
+    private var notificationToken: NotificationToken?
+    private var kvo: NSKeyValueObservation?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -43,9 +50,39 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
     
     var textModule: TextModule! {
         didSet {
+            guard textModule !== oldValue else { return }
+            
             let attribString = NSMutableAttributedString(string: (textModule.character?.name ?? "") + ": ", attributes: [.foregroundColor : Asset.Colors.Grayscale._10.color])
             attribString.append(textModule.text ?? NSAttributedString())
             textView.attributedText = attribString
+            
+            let rootView = InputAccessoryView(game: self.textModule.level!.game!, textModule: self.textModule) { [weak self] character in
+                self?.textModule.character = character
+                try? self?.textModule.managedObjectContext?.save()
+            } addCharacterTapped: { [weak self] in
+                self?.addCharacterTapped()
+            } saveButtonTapped: { [weak self] in
+                self?.saveButtonTapped()
+            }
+                .environment(\.managedObjectContext, textModule.managedObjectContext!)
+            let view = UIHostingController(rootView: rootView).view!
+            view.bounds.size.height = view.intrinsicContentSize.height
+            view.backgroundColor = .clear
+            textView.inputAccessoryView = view
+            
+            self.kvo = textModule.observe(\.character, options: [.old, .new]) { [weak self] _, change in
+                guard let self else { return }
+                
+                let attribString = self.textView.attributedText.mutableCopy() as? NSMutableAttributedString
+                if let oldValue = change.oldValue, let oldCharacter = oldValue {
+                    let replacementText = oldCharacter.name ?? ""
+                    attribString?.mutableString.replaceOccurrences(of: replacementText, with: change.newValue??.name ?? "", range: NSRange(location: 0, length: attribString?.length ?? 0))
+                } else {
+                    attribString?.mutableString.insert((change.newValue??.name ?? "") + ": ", at: 0)
+                }
+                
+                self.textView.attributedText = attribString
+            }
         }
     }
     
@@ -61,6 +98,38 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
         catch {
             preconditionFailure("Failed to save text module text")
         }
+        self.hasBeenSelected = false
+    }
+    
+    private func addCharacterTapped() {
+        let alert = UIAlertController(title: "Character name", message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        let confirmAction = UIAlertAction(title: "OK", style: .default) { [weak alert, weak self] _ in
+            let title = alert?.textFields?.first?.text?.trimmingCharacters(in: .whitespaces) ?? ""
+            self?.createCharacter(with: title)
+        }
+        confirmAction.isEnabled = false
+        alert.addAction(confirmAction)
+        alert.addTextField {
+            $0.autocapitalizationType = .words
+        }
+        self.presentingViewController.present(alert, animated: true)
+        self.notificationToken = NotificationCenter.default.addTokenizedObserver(forName: UITextField.textDidChangeNotification, object: alert.textFields?.first, queue: .main) { _ in
+            confirmAction.isEnabled = !(alert.textFields?.first?.text?.trimmingCharacters(in: .whitespaces).isEmpty ?? true)
+        }
+    }
+    
+    private func createCharacter(with name: String) {
+        guard DataManager.shared.character(with: name, game: textModule.level!.game!) == nil else {
+            let alert = UIAlertController(title: "Character named \(name) exists already.", message: nil, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.presentingViewController.present(alert, animated: true)
+            return
+        }
+        
+        let character = DataManager.shared.createCharacter(with: name, game: textModule.level!.game!)
+        textModule.character = character
+        try? textModule.managedObjectContext?.save()
     }
     
     struct CellContent: View {
@@ -72,21 +141,35 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
     }
     
     fileprivate struct InputAccessoryView: View {
+        @ObservedObject var game: Game
+        @ObservedObject var textModule: TextModule
+        let selectedCharacterChanged: (Character) -> Void
+        let addCharacterTapped: () -> Void
         let saveButtonTapped: () -> Void
-        
+
         var body: some View {
             VStack(spacing: 0) {
                 Asset.Colors.Grayscale._70.swiftUIColor
                     .frame(height: 1)
                 
-                ScrollView {
-                    HStack(spacing: 0) {
-                        ButtonWithRoundedCornerBackground(cornerRadius: 15, backgroundColor: .clear, borderColor: Asset.Colors.Grayscale._70.swiftUIColor, selectedStatebackgroundColor: Asset.Colors.primary.swiftUIColor, selectedStateBorderColor: Asset.Colors.primary.swiftUIColor, isSelected: .constant(true)) {
-                            
-                        } content: {
-                            Text("Narrator")
-                                .font(.system(size: 12))
-                                .foregroundColor(Asset.Colors.secondary.swiftUIColor)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 5) {
+                        ForEach((game.characters?.array as? [Character]) ?? []) { character in
+                            ButtonWithRoundedCornerBackground(cornerRadius: 15, backgroundColor: .clear, borderColor: Asset.Colors.Grayscale._70.swiftUIColor, selectedStatebackgroundColor: Asset.Colors.primary.swiftUIColor, selectedStateBorderColor: Asset.Colors.primary.swiftUIColor, isSelected: .constant(textModule.character == character)) {
+                                selectedCharacterChanged(character)
+                            } content: {
+                                Text(character.name ?? "")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(textModule.character == character ? Asset.Colors.secondary.swiftUIColor : Asset.Colors.Grayscale._10.swiftUIColor.opacity(0.56))
+                                    .padding(.horizontal, 10)
+                            }
+                            .frame(height: 30)
+                        }
+                        
+                        ButtonWithRoundedCornerBackground(cornerRadius: 15, backgroundColor: .clear, borderColor: Asset.Colors.Grayscale._70.swiftUIColor, selectedStatebackgroundColor: Asset.Colors.Grayscale._70.swiftUIColor, isSelected: .constant(false), action: addCharacterTapped) {
+                            Text("+ Add Character")
+                                .font(.system(size: 13))
+                                .foregroundColor(Asset.Colors.Grayscale._10.swiftUIColor.opacity(0.56))
                                 .padding(.horizontal, 10)
                         }
                         .frame(height: 30)

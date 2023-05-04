@@ -58,7 +58,23 @@ final class GameEditorViewController: BaseViewController {
     private let textModuleCellRegistration = UICollectionView.CellRegistration<TextModuleCollectionViewCell, ItemType> {_, _, _ in }
     
     private var selectedLevel: Int = 0
-    private var selectedModule: ItemType?
+    private var selectedModule: ItemType? {
+        willSet {
+            guard let selectedModule else { return }
+            
+            if let indexPath = self.collectionViewDataSource.indexPath(for: selectedModule),
+               let cell = self.collectionView.cellForItem(at: indexPath) as? SelectableCollectionViewCell {
+                cell.hasBeenSelected = false
+            }
+        }
+        
+        didSet {
+            if let selectedModule, let indexPath = self.collectionViewDataSource.indexPath(for: selectedModule),
+               let cell = self.collectionView.cellForItem(at: indexPath) as? SelectableCollectionViewCell {
+                cell.hasBeenSelected = true
+            }
+        }
+    }
     private lazy var addModuleToolbar = {
         let toolbar = UIHostingController(rootView: AddModuleToolbar() { [weak self] in
             self?.toolbarButtonTapped($0)
@@ -140,6 +156,7 @@ final class GameEditorViewController: BaseViewController {
             self.selectedLevel
         }, set: {
             self.selectedLevel = $0
+            self.changeLevel(to: self.game.levels!.array[$0] as! Level)
         })))
         self.view.addSubview(vc.view)
         vc.view.translatesAutoresizingMaskIntoConstraints = false
@@ -168,8 +185,30 @@ final class GameEditorViewController: BaseViewController {
         var snapshot = NSDiffableDataSourceSnapshot<SectionIdentifier, ItemType>()
         snapshot.appendSections([.levelSettings, .modules])
         snapshot.appendItems([.levelSettingBackground, .levelSettingMusic], toSection: .levelSettings)
-        snapshot.appendItems([.module(.playerEnters), .module(.addNewModule)], toSection: .modules)
+        self.addModulesToDataSource(for: self.game.levels!.firstObject as! Level, snapshot: &snapshot)
         self.collectionViewDataSource.apply(snapshot)
+    }
+    
+    private func changeLevel(to level: Level) {
+        var snapshot = self.collectionViewDataSource.snapshot()
+        snapshot.deleteItems(snapshot.itemIdentifiers(inSection: .modules))
+        self.addModulesToDataSource(for: level, snapshot: &snapshot)
+        self.collectionViewDataSource.apply(snapshot)
+    }
+    
+    private func addModulesToDataSource(for level: Level, snapshot: inout NSDiffableDataSourceSnapshot<SectionIdentifier, ItemType>) {
+        var modules = [ItemType.module(.playerEnters)]
+        (level.modules?.array as? [Module])?.forEach { module in
+            switch module {
+            case let textModule as TextModule:
+                modules.append(.module(.text(textModule)))
+                
+            default:
+                break
+            }
+        }
+        modules.append(.module(.addNewModule))
+        snapshot.appendItems(modules, toSection: .modules)
     }
     
     private func cell(for indexPath: IndexPath, itemIdentifier: ItemType) -> UICollectionViewCell {
@@ -203,6 +242,7 @@ final class GameEditorViewController: BaseViewController {
             case .text(let textModule):
                 let cell = self.collectionView.dequeueConfiguredReusableCell(using: textModuleCellRegistration, for: indexPath, item: itemIdentifier)
                 cell.textModule = textModule
+                cell.presentingViewController = self
                 return cell
             }
         }
@@ -256,18 +296,12 @@ final class GameEditorViewController: BaseViewController {
             let textModule = DataManager.shared.addTextModule(to: level)
             
             let newTextModuleType = ItemType.module(.text(textModule))
-            self.selectedModule = newTextModuleType
-            self.showHideToolbar()
             
             var snapshot = self.collectionViewDataSource.snapshot()
-            snapshot.deleteItems([.module(.addNewModule)])
-            snapshot.appendItems([newTextModuleType], toSection: .modules)
-            self.collectionViewDataSource.apply(snapshot) {
-                guard let indexPath = self.collectionViewDataSource.indexPath(for: newTextModuleType),
-                      let cell = self.collectionView.cellForItem(at: indexPath) as? TextModuleCollectionViewCell else { return }
-                
-                cell.hasBeenSelected = true
-            }
+            snapshot.insertItems([newTextModuleType], beforeItem: .module(.addNewModule))
+            self.collectionViewDataSource.apply(snapshot)
+            self.selectedModule = newTextModuleType
+            self.showHideToolbar()
         }
     }
 }
@@ -438,13 +472,9 @@ extension GameEditorViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? AddModuleCollectionViewCell else { return }
-        
         if self.itemIdentifier(from: indexPath) == self.selectedModule {
-            cell.hasBeenSelected = false
             self.selectedModule = nil
         } else {
-            cell.hasBeenSelected = true
             self.selectedModule = self.itemIdentifier(from: indexPath)
         }
         

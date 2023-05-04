@@ -59,11 +59,12 @@ final class DataManager: NSObject {
     }
     
     func addTextModule(to level: Level) -> TextModule {
-        var character: Character! = self.character(with: "Narrator")
+        var character: Character! = self.character(with: "Narrator", game: level.game!)
         if character == nil {
-            character = Character(context: level.managedObjectContext!)
-            character.name = "Narrator"
+            character = self.createCharacter(with: "Narrator", game: level.game!)
         }
+        
+        level.game!.addToCharacters(character)
         
         let textModule = TextModule(context: level.managedObjectContext!)
         textModule.character = character
@@ -77,9 +78,22 @@ final class DataManager: NSObject {
         return textModule
     }
     
-    func character(with name: String) -> Character? {
-        let fetchRequest = NSFetchRequest<Character>(entityName: Character.entity().name!)
-        fetchRequest.predicate = NSPredicate(format: "name == %@", name)
-        return (try? fetchRequest.execute())?.first
+    func character(with name: String, game: Game) -> Character? {
+        (game.characters?.array as? [Character])?.first {
+            $0.name == name
+        }
+    }
+    
+    func createCharacter(with name: String, game: Game) -> Character {
+        let character = Character(context: game.managedObjectContext!)
+        character.name = name
+        game.addToCharacters(character)
+        do {
+            try game.managedObjectContext!.save()
+        }
+        catch {
+            preconditionFailure("Failed to add text module.")
+        }
+        return character
     }
 }

@@ -8,7 +8,12 @@
 import UIKit
 import SwiftUI
 
-class SwiftUIHostingCollectionViewCell<Content: View>: UICollectionViewCell, ObservableObject {
+protocol SelectableCollectionViewCell where Self: UICollectionViewCell {
+    var isSelectable: Bool { get set }
+    var hasBeenSelected: Bool { get set }
+}
+
+class SwiftUIHostingCollectionViewCell<Content: View>: UICollectionViewCell, SelectableCollectionViewCell, ObservableObject {
     @Published var isSelectable = false
     @Published var hasBeenSelected = false
 
