@@ -26,6 +26,7 @@ final class GameEditorViewController: BaseViewController {
         case playerEnters
         case addNewModule
         case text(TextModule)
+        case image(ImageModule)
     }
     
     private let backgroundImageView = {
@@ -54,7 +55,8 @@ final class GameEditorViewController: BaseViewController {
     private let playerEntersCellRegistration = UICollectionView.CellRegistration<PlayerEntersCollectionViewCell, ItemType> {_, _, _ in }
     private let addModuleCellRegistration = UICollectionView.CellRegistration<AddModuleCollectionViewCell, ItemType> {_, _, _ in }
     private let textModuleCellRegistration = UICollectionView.CellRegistration<TextModuleCollectionViewCell, ItemType> {_, _, _ in }
-    
+    private let imageModuleCellRegistration = UICollectionView.CellRegistration<ImageModuleCollectionViewCell, ItemType> {_, _, _ in }
+
     private var selectedLevel: Int = 0
     private var selectedModule: ItemType? {
         willSet {
@@ -170,6 +172,9 @@ final class GameEditorViewController: BaseViewController {
             case let textModule as TextModule:
                 modules.append(.module(.text(textModule)))
                 
+            case let imageModule as ImageModule:
+                modules.append(.module(.image(imageModule)))
+                
             default:
                 break
             }
@@ -213,6 +218,11 @@ final class GameEditorViewController: BaseViewController {
                 cell.cellHeightChanged = { [weak self] in
                     self?.collectionView.collectionViewLayout.invalidateLayout()
                 }
+                return cell
+                
+            case .image(let imageModule):
+                let cell = self.collectionView.dequeueConfiguredReusableCell(using: imageModuleCellRegistration, for: indexPath, item: itemIdentifier)
+                cell.imageModule = imageModule
                 return cell
             }
         }
@@ -260,7 +270,8 @@ final class GameEditorViewController: BaseViewController {
     }
     
     private func toolbarButtonTapped(_ buttonType: AddModuleToolbar.ToolbarButton) {
-        if buttonType == .text {
+        switch buttonType {
+        case .text:
             guard let level = (self.game.levels?.array as? [Level])?[self.selectedLevel] else {
                 preconditionFailure("Atleast 1 level should exist")
             }
@@ -274,6 +285,27 @@ final class GameEditorViewController: BaseViewController {
             self.collectionViewDataSource.apply(snapshot)
             self.selectedModule = newTextModuleType
             self.showHideToolbar()
+            
+        case .image:
+            ImageVideoPicker.presentImagePicker(on: self) { results in
+                results.first?.image { image in
+                    guard let image else { return }
+                    
+                    guard let level = (self.game.levels?.array as? [Level])?[self.selectedLevel] else {
+                        preconditionFailure("Atleast 1 level should exist")
+                    }
+                    let imageModule = DataManager.shared.addImageModule(to: level, image: image)
+                    let newTextModuleType = ItemType.module(.image(imageModule))
+                    
+                    var snapshot = self.collectionViewDataSource.snapshot()
+                    snapshot.insertItems([newTextModuleType], beforeItem: .module(.addNewModule))
+                    self.collectionViewDataSource.apply(snapshot)
+                    self.selectedModule = newTextModuleType
+                }
+            }
+            
+        default:
+            break
         }
     }
 }

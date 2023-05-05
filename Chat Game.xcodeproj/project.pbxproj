@@ -10,6 +10,10 @@
 		414FFC632A05A5FE0065772E /* TextModule+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414FFC612A05A5FE0065772E /* TextModule+CoreDataClass.swift */; };
 		414FFC642A05A5FE0065772E /* TextModule+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414FFC622A05A5FE0065772E /* TextModule+CoreDataProperties.swift */; };
 		414FFC662A05A66E0065772E /* UIImageArrayTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414FFC652A05A66E0065772E /* UIImageArrayTransformer.swift */; };
+		414FFC692A05C0D50065772E /* ImageModule+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414FFC672A05C0D50065772E /* ImageModule+CoreDataClass.swift */; };
+		414FFC6A2A05C0D50065772E /* ImageModule+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414FFC682A05C0D50065772E /* ImageModule+CoreDataProperties.swift */; };
+		414FFC6E2A05C2600065772E /* UIImageTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414FFC6D2A05C2600065772E /* UIImageTransformer.swift */; };
+		414FFC702A05C4FB0065772E /* ImageModuleCollectionViewCell .swift in Sources */ = {isa = PBXBuildFile; fileRef = 414FFC6F2A05C4FB0065772E /* ImageModuleCollectionViewCell .swift */; };
 		4189778E29E4D9A500055D90 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4189778D29E4D9A500055D90 /* AppDelegate.swift */; };
 		4189779029E4D9A500055D90 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4189778F29E4D9A500055D90 /* SceneDelegate.swift */; };
 		418977A329E4DCB500055D90 /* MainNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418977A229E4DCB500055D90 /* MainNavigationController.swift */; };
@@ -41,6 +45,10 @@
 		414FFC612A05A5FE0065772E /* TextModule+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextModule+CoreDataClass.swift"; sourceTree = "<group>"; };
 		414FFC622A05A5FE0065772E /* TextModule+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextModule+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		414FFC652A05A66E0065772E /* UIImageArrayTransformer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageArrayTransformer.swift; sourceTree = "<group>"; };
+		414FFC672A05C0D50065772E /* ImageModule+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageModule+CoreDataClass.swift"; sourceTree = "<group>"; };
+		414FFC682A05C0D50065772E /* ImageModule+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageModule+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		414FFC6D2A05C2600065772E /* UIImageTransformer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageTransformer.swift; sourceTree = "<group>"; };
+		414FFC6F2A05C4FB0065772E /* ImageModuleCollectionViewCell .swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ImageModuleCollectionViewCell .swift"; sourceTree = "<group>"; };
 		4189778A29E4D9A500055D90 /* Chat Game Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Chat Game Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4189778D29E4D9A500055D90 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4189778F29E4D9A500055D90 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -153,6 +161,7 @@
 				41E5A7BB29F5D961004C3355 /* TextModuleCollectionViewCell.swift */,
 				418977BC29EC967E00055D90 /* PlayerEntersCollectionViewCell.swift */,
 				418977BE29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift */,
+				414FFC6F2A05C4FB0065772E /* ImageModuleCollectionViewCell .swift */,
 				41E5A7B729EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift */,
 			);
 			path = Cells;
@@ -165,8 +174,11 @@
 				41D849A029FADC4600F46924 /* DataManager.swift */,
 				414FFC612A05A5FE0065772E /* TextModule+CoreDataClass.swift */,
 				414FFC622A05A5FE0065772E /* TextModule+CoreDataProperties.swift */,
+				414FFC672A05C0D50065772E /* ImageModule+CoreDataClass.swift */,
+				414FFC682A05C0D50065772E /* ImageModule+CoreDataProperties.swift */,
 				41D849A729FB8E1E00F46924 /* NSAttributedStringTransformer.swift */,
 				414FFC652A05A66E0065772E /* UIImageArrayTransformer.swift */,
+				414FFC6D2A05C2600065772E /* UIImageTransformer.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -256,6 +268,7 @@
 				418977B729EB4E4100055D90 /* AccountViewController.swift in Sources */,
 				414FFC662A05A66E0065772E /* UIImageArrayTransformer.swift in Sources */,
 				4189778E29E4D9A500055D90 /* AppDelegate.swift in Sources */,
+				414FFC702A05C4FB0065772E /* ImageModuleCollectionViewCell .swift in Sources */,
 				418977B429EB4D3B00055D90 /* BrowseViewController.swift in Sources */,
 				418977BF29EC9E0F00055D90 /* AddModuleCollectionViewCell.swift in Sources */,
 				414FFC642A05A5FE0065772E /* TextModule+CoreDataProperties.swift in Sources */,
@@ -268,6 +281,8 @@
 				418977A829E6236000055D90 /* GameEditorViewController.swift in Sources */,
 				418977AE29E91C3A00055D90 /* BaseViewController.swift in Sources */,
 				41D849A829FB8E1E00F46924 /* NSAttributedStringTransformer.swift in Sources */,
+				414FFC6E2A05C2600065772E /* UIImageTransformer.swift in Sources */,
+				414FFC692A05C0D50065772E /* ImageModule+CoreDataClass.swift in Sources */,
 				41E5A7B829EF5202004C3355 /* SwiftUIHostingCollectionViewCell.swift in Sources */,
 				418977B829EB4E4100055D90 /* SpendViewController.swift in Sources */,
 				41E5A7C429F6FAB7004C3355 /* XCAssets+Generated.swift in Sources */,
@@ -277,6 +292,7 @@
 				41D849A129FADC4600F46924 /* DataManager.swift in Sources */,
 				418977B229EB4C7A00055D90 /* FavoritesViewController.swift in Sources */,
 				4189779029E4D9A500055D90 /* SceneDelegate.swift in Sources */,
+				414FFC6A2A05C0D50065772E /* ImageModule+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

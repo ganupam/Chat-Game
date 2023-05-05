@@ -84,6 +84,19 @@ final class DataManager: NSObject {
         return textModule
     }
     
+    func addImageModule(to level: Level, image: UIImage) -> ImageModule {
+        let imageModule = ImageModule(context: level.managedObjectContext!)
+        imageModule.image = image
+        level.addToModules(imageModule)
+        do {
+            try level.managedObjectContext?.save()
+        }
+        catch {
+            preconditionFailure("Failed to add image module.")
+        }
+        return imageModule
+    }
+    
     func character(with name: String, game: Game) -> Character? {
         (game.characters?.array as? [Character])?.first {
             $0.name == name

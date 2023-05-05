@@ -20,10 +20,11 @@ final class UIImageArrayTransformer: ValueTransformer {
     }
     
     override func transformedValue(_ value: Any?) -> Any? {
-        guard let images = value as? NSArray else { return nil }
+        guard let images = value as? [UIImage] else { return nil }
         
+        let imagesData = images.map { $0.jpegData(compressionQuality: 1) }
         do {
-            let data = try NSKeyedArchiver.archivedData(withRootObject: images, requiringSecureCoding: false)
+            let data = try NSKeyedArchiver.archivedData(withRootObject: imagesData, requiringSecureCoding: false)
             return data
         }
         catch {
@@ -36,13 +37,13 @@ final class UIImageArrayTransformer: ValueTransformer {
         guard let data = value as? Data else { return nil }
         
         do {
-            let image = try NSKeyedUnarchiver.unsecureUnarchivedObject(ofClass: NSArray.self, from: data)
-            return image
+            let imagesData = try NSKeyedUnarchiver.unsecureUnarchivedObject(ofClass: NSArray.self, from: data) as? [Data]
+            let images = imagesData?.map { UIImage(data: $0) }
+            return images
         }
         catch {
             assertionFailure("Failed to transform Data to MidomiTrack")
             return nil
         }
-        
     }
 }

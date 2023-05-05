@@ -11,6 +11,11 @@
         <relationship name="characters" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Character" inverseName="game" inverseEntity="Character"/>
         <relationship name="levels" toMany="YES" minCount="1" deletionRule="Cascade" ordered="YES" destinationEntity="Level" inverseName="game" inverseEntity="Level"/>
     </entity>
+    <entity name="ImageModule" representedClassName="ImageModule" parentEntity="Module" syncable="YES">
+        <attribute name="alignment" attributeType="Integer 16" minValueString="0" maxValueString="2" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="image" attributeType="Transformable" valueTransformerName="UIImageTransformer" customClassName="UIImage"/>
+        <attribute name="size" attributeType="Integer 16" minValueString="0" maxValueString="2" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
     <entity name="Level" representedClassName="Level" syncable="YES" codeGenerationType="class">
         <attribute name="backgroundImage" optional="YES" attributeType="Binary"/>
         <relationship name="game" maxCount="1" deletionRule="Nullify" destinationEntity="Game" inverseName="levels" inverseEntity="Game"/>

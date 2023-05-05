@@ -48,3 +48,25 @@ extension ImageVideoPicker {
         }
     }
 }
+
+extension Array where Element == PHPickerResult {
+    func images(imageHandler: @escaping (UIImage?) -> Void) {
+        for result in self {
+            result.image(imageHandler: imageHandler)
+        }
+    }
+}
+
+extension PHPickerResult {
+    func image(imageHandler: @escaping (UIImage?) -> Void) {
+        guard self.itemProvider.canLoadObject(ofClass: UIImage.self) else { imageHandler(nil); return }
+        
+        self.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
+            DispatchQueue.main.async {
+                guard let image = image as? UIImage, error == nil else { imageHandler(nil); return }
+
+                imageHandler(image)
+            }
+        }
+    }
+}
