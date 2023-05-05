@@ -19,6 +19,7 @@ final class DataManager: NSObject {
         super.init()
         
         NSAttributedStringTransformer.register()
+        UIImageArrayTransformer.register()
 
         self.persistentContainer.loadPersistentStores { storeDescription, error in
             guard error == nil else {

@@ -42,7 +42,7 @@ final class GameEditorViewController: BaseViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
-        collectionView.keyboardDismissMode = .onDragWithAccessory
+        collectionView.contentInset = .init(top: 0, left: 0, bottom: 30, right: 0)
         return collectionView
     }()
     
@@ -99,6 +99,12 @@ final class GameEditorViewController: BaseViewController {
         super.viewDidLoad()
                 
         self.initializeGameEditor()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
+    }
+    
+    @objc private func keyboardDidShow(_ notification: NSNotification) {
+
     }
     
     private func initializeGameEditor() {
@@ -121,7 +127,7 @@ final class GameEditorViewController: BaseViewController {
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[backgroundImageView]|", metrics: nil, views: ["backgroundImageView" : self.backgroundImageView]))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[levelsView]|", metrics: nil, views: ["levelsView" : vc.view!]))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[collectionView]|", metrics: nil, views: ["collectionView" : self.collectionView]))
-        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-19-[levelsView(==29)]-19-[collectionView]|", metrics: nil, views: ["levelsView" : vc.view!, "collectionView" : self.collectionView]))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-19-[levelsView(==29)]-19-[collectionView]", metrics: nil, views: ["levelsView" : vc.view!, "collectionView" : self.collectionView]))
         
         self.view.addSubview(self.addModuleToolbar)
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-20-[toolbar]-20-|", metrics: nil, views: ["toolbar" : self.addModuleToolbar as Any]))
@@ -129,6 +135,8 @@ final class GameEditorViewController: BaseViewController {
             self.addModuleToolbar.heightAnchor.constraint(equalToConstant: 54),
             self.addModuleToolbar.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -10)
         ])
+        
+        self.view.keyboardLayoutGuide.topAnchor.constraint(equalTo: self.collectionView.bottomAnchor).isActive = true
         
         self.loadGame()
     }
@@ -202,6 +210,9 @@ final class GameEditorViewController: BaseViewController {
                 let cell = self.collectionView.dequeueConfiguredReusableCell(using: textModuleCellRegistration, for: indexPath, item: itemIdentifier)
                 cell.textModule = textModule
                 cell.presentingViewController = self
+                cell.cellHeightChanged = { [weak self] in
+                    self?.collectionView.collectionViewLayout.invalidateLayout()
+                }
                 return cell
             }
         }
@@ -219,8 +230,8 @@ final class GameEditorViewController: BaseViewController {
             return section
 
         case .modules:
-            let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(40)))
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(40)), subitem: item, count: 1)
+            let item = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(240)))
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(240)), subitem: item, count: 1)
             let section = NSCollectionLayoutSection(group: group)
             section.interGroupSpacing = 12
             section.contentInsets = .init(top: 17, leading: 0, bottom: 0, trailing: 0)
@@ -292,7 +303,7 @@ extension GameEditorViewController {
                         DataManager.shared.addLevel(to: game)
                         selectLevel((game.levels?.count ?? 0) - 1)
                     } content: {
-                        Image("add_level")
+                        Image(systemName: "plus")
                             .frame(width: 66)
                     }
                 }
@@ -330,8 +341,11 @@ extension GameEditorViewController {
                             Button {
                                 toolbarButtonTapped(.add)
                             } label: {
-                                Image("module_add")
+                                Image(systemName: "plus")
+                                    .resizable()
+                                    .frame(width: 20, height: 20)
                             }
+                            .frame(width: 33, height: 33)
                             .disabled(true)
                             
                             Spacer()

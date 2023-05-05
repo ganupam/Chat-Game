@@ -12,9 +12,10 @@ import PhotosUI
 class ImageVideoPicker {
     private static var delegate: ImageVideoPickerDelegate?
     
-    class func presentImagePicker(on viewController: UIViewController, completionHandler: @escaping ([PHPickerResult]) -> Void) {
+    class func presentImagePicker(on viewController: UIViewController, allowMultipleSelection: Bool = false, completionHandler: @escaping ([PHPickerResult]) -> Void) {
         var config = PHPickerConfiguration()
         config.filter = .images
+        config.selectionLimit = allowMultipleSelection ? 0 : 1
         let picker = PHPickerViewController(configuration: config)
         picker.overrideUserInterfaceStyle = .dark
         picker.view.tintColor = Asset.Colors.primary.color

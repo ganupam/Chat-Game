@@ -46,14 +46,14 @@ internal enum Asset {
   }
   internal enum Images {
     internal static let account = ImageAsset(name: "account")
-    internal static let addLevel = ImageAsset(name: "add_level")
+    internal static let addTextImage = ImageAsset(name: "add_text_image")
     internal static let cards = ImageAsset(name: "cards")
     internal static let createGameTab = ImageAsset(name: "create_game_tab")
+    internal static let deleteTextModuleImage = ImageAsset(name: "delete_text_module_image")
     internal static let favorites = ImageAsset(name: "favorites")
     internal static let levelBackgroundImage = ImageAsset(name: "level_background_image")
     internal static let levelSelected = ImageAsset(name: "level_selected")
     internal static let levelUnselected = ImageAsset(name: "level_unselected")
-    internal static let moduleAdd = ImageAsset(name: "module_add")
     internal static let moduleCondition = ImageAsset(name: "module_condition")
     internal static let moduleGameController = ImageAsset(name: "module_game_controller")
     internal static let moduleImage = ImageAsset(name: "module_image")
