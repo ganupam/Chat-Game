@@ -58,6 +58,7 @@ final class GameEditorViewController: BaseViewController {
     private let imageModuleCellRegistration = UICollectionView.CellRegistration<ImageModuleCollectionViewCell, ItemType> {_, _, _ in }
 
     private var selectedLevel: Int = 0
+    private var currentModuleSettingsView: UIView?
     private var selectedModule: ItemType? {
         willSet {
             guard let selectedModule else { return }
@@ -73,6 +74,8 @@ final class GameEditorViewController: BaseViewController {
                let cell = self.collectionView.cellForItem(at: indexPath) as? SelectableCollectionViewCell {
                 cell.hasBeenSelected = true
             }
+            
+            self.showHideModuleSettingsView()
         }
     }
     private lazy var addModuleToolbar = {
@@ -101,12 +104,12 @@ final class GameEditorViewController: BaseViewController {
         super.viewDidLoad()
                 
         self.initializeGameEditor()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
     }
     
-    @objc private func keyboardDidShow(_ notification: NSNotification) {
-
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        self.selectedModule = nil
     }
     
     private func initializeGameEditor() {
@@ -223,6 +226,9 @@ final class GameEditorViewController: BaseViewController {
             case .image(let imageModule):
                 let cell = self.collectionView.dequeueConfiguredReusableCell(using: imageModuleCellRegistration, for: indexPath, item: itemIdentifier)
                 cell.imageModule = imageModule
+                cell.cellHeightChanged = { [weak self] in
+                    self?.collectionView.collectionViewLayout.invalidateLayout()
+                }
                 return cell
             }
         }
@@ -284,7 +290,6 @@ final class GameEditorViewController: BaseViewController {
             snapshot.insertItems([newTextModuleType], beforeItem: .module(.addNewModule))
             self.collectionViewDataSource.apply(snapshot)
             self.selectedModule = newTextModuleType
-            self.showHideToolbar()
             
         case .image:
             ImageVideoPicker.presentImagePicker(on: self) { results in
@@ -448,27 +453,133 @@ extension GameEditorViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if self.itemIdentifier(from: indexPath) == self.selectedModule {
+        let itemIdentifier = self.itemIdentifier(from: indexPath)
+        if itemIdentifier == self.selectedModule {
             self.selectedModule = nil
         } else {
-            self.selectedModule = self.itemIdentifier(from: indexPath)
+            self.selectedModule = itemIdentifier
         }
-        
-        self.showHideToolbar()
     }
     
     func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
         canSelectDeselect(indexPath)
     }
     
-    private func showHideToolbar() {
-        var alpha = 0.0
-        if case let .module(type) = self.selectedModule, type == .addNewModule {
-            alpha = 1
+    private func showHideModuleSettingsView() {
+        guard let selectedModule else {
+            UIView.animate(withDuration: 0.15) {
+                self.currentModuleSettingsView?.alpha = 0
+            } completion: { _ in
+                self.currentModuleSettingsView = nil
+            }
+            return
         }
 
-        UIView.animate(withDuration: 0.15) {
-            self.addModuleToolbar.alpha = alpha
+        UIView.animate(withDuration: 0.1) {
+            self.currentModuleSettingsView?.alpha = 0
+        }
+
+        if case let .module(type) = selectedModule, type == .addNewModule {
+            UIView.animate(withDuration: 0.1) {
+                self.addModuleToolbar.alpha = 1
+            } completion: { _ in
+                self.currentModuleSettingsView = self.addModuleToolbar
+            }
+        } else if case let .module(type) = selectedModule, case let .image(imageModule) = type {
+            let vc = UIHostingController(rootView: ImageModuleSettings(imageModule: imageModule))
+            vc.view.translatesAutoresizingMaskIntoConstraints = false
+            vc.view.alpha = 0
+            vc.view.backgroundColor = Asset.Colors.Utility.headerBackground.color
+            self.tabBarController?.view.addSubview(vc.view)
+            self.tabBarController?.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|", metrics: nil, views: ["view" : vc.view!]))
+            self.tabBarController?.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:[view]|", metrics: nil, views: ["view" : vc.view!]))
+            UIView.animate(withDuration: 0.1) {
+                vc.view.alpha = 1
+            } completion: { _ in
+                self.currentModuleSettingsView = vc.view
+            }
+        }
+    }
+}
+
+extension GameEditorViewController {
+    private struct ImageModuleSettings: View {
+        @ObservedObject var imageModule: ImageModule
+        
+        private func button(for size: ImageModule.Size) -> some View {
+            Button {
+                imageModule.size = size
+                do {
+                    try imageModule.managedObjectContext?.save()
+                } catch {
+                    preconditionFailure("Failed to save image module size")
+                }
+            } label: {
+                Text(size.description)
+                    .font(.system(size: 12))
+                    .foregroundColor(Asset.Colors.Grayscale._30.swiftUIColor)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 37)
+            .border(imageModule.size == size ? Asset.Colors.primary.swiftUIColor : Asset.Colors.Grayscale._70.swiftUIColor)
+            .cornerRadius(3)
+        }
+
+        private func button(for alignment: ImageModule.Alignment) -> some View {
+            Button {
+                imageModule.alignment = alignment
+                do {
+                    try imageModule.managedObjectContext?.save()
+                } catch {
+                    preconditionFailure("Failed to save image module alignment")
+                }
+            } label: {
+                Text(alignment.description)
+                    .font(.system(size: 12))
+                    .foregroundColor(Asset.Colors.Grayscale._30.swiftUIColor)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 37)
+            .border(imageModule.alignment == alignment ? Asset.Colors.primary.swiftUIColor : Asset.Colors.Grayscale._70.swiftUIColor)
+            .cornerRadius(3)
+        }
+
+        var body: some View {
+            VStack(spacing: 0) {
+                Asset.Colors.Grayscale._70.swiftUIColor
+                    .frame(height: 1)
+                
+                Text("IMAGE SIZE")
+                    .font(.system(size: 12, weight: .semibold)).kerning(1.5)
+                    .foregroundColor(Asset.Colors.Grayscale._50.swiftUIColor)
+                    .padding(.top, 19)
+                
+                HStack(spacing: 9) {
+                    button(for: .small)
+
+                    button(for: .medium)
+
+                    button(for: .large)
+                }
+                .padding(.top, 14)
+                .padding(.horizontal, 18)
+                
+                Text("ALIGNMENT")
+                    .font(.system(size: 12, weight: .semibold)).kerning(1.5)
+                    .foregroundColor(Asset.Colors.Grayscale._50.swiftUIColor)
+                    .padding(.top, 19)
+                
+                HStack(spacing: 9) {
+                    button(for: .left)
+
+                    button(for: .center)
+
+                    button(for: .right)
+                }
+                .padding(.top, 14)
+                .padding(.horizontal, 18)
+                .padding(.bottom, 19)
+            }
         }
     }
 }

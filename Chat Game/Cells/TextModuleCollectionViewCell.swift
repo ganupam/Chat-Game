@@ -30,8 +30,6 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
         }
     }
     
-    var cellHeightChanged: (() -> Void)?
-    
     var presentingViewController: UIViewController!
     
     private var notificationToken: NotificationToken?
@@ -110,6 +108,7 @@ final class TextModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<TextM
     
     private func createImagesVC() {
         let rootView = Images(cell: self, textModule: self.textModule, cellHeightChanged: { [weak self] in
+            self?.imagesVC?.view.invalidateIntrinsicContentSize()
             self?.cellHeightChanged?()
         }, deleteImageTapped: { [weak self] in
             self?.deleteImageTapped($0)
@@ -356,9 +355,7 @@ private extension TextModuleCollectionViewCell {
                 .padding(.top, 11)
             }
             .onChange(of: textModule.images) { _ in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    cellHeightChanged()
-                }
+                cellHeightChanged()
             }
         }
     }

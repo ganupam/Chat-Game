@@ -12,6 +12,7 @@ import Combine
 final class ImageModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<ImageModuleCollectionViewCell.CellContent> {
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         self.isSelectable = true
     }
     
@@ -21,12 +22,16 @@ final class ImageModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<Imag
     
     var imageModule: ImageModule! {
         didSet {
-            self.swiftUIContentView = CellContent(imageModule: self.imageModule)
+            self.swiftUIContentView = CellContent(imageModule: self.imageModule) {
+                self.swiftUIContentViewController?.view.invalidateIntrinsicContentSize()
+                self.cellHeightChanged?()
+            }
         }
     }
     
     struct CellContent: View {
         @ObservedObject var imageModule: ImageModule
+        let cellHeightChanged: () -> Void
         
         var imageWidthHeight: CGFloat {
             switch imageModule.size {
@@ -57,7 +62,9 @@ final class ImageModuleCollectionViewCell: SwiftUIHostingCollectionViewCell<Imag
                 }
             }
             .padding(.vertical, 13)
-            .padding(.horizontal, 19)
+            .onChange(of: imageModule.size) { _ in
+                cellHeightChanged()
+            }
         }
     }
 }

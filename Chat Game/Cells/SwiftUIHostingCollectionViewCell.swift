@@ -16,7 +16,9 @@ protocol SelectableCollectionViewCell where Self: UICollectionViewCell {
 class SwiftUIHostingCollectionViewCell<Content: View>: UICollectionViewCell, SelectableCollectionViewCell, ObservableObject {
     @Published var isSelectable = false
     @Published var hasBeenSelected = false
-
+    var cellHeightChanged: (() -> Void)?
+    private(set) var swiftUIContentViewController: UIViewController?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -34,6 +36,7 @@ class SwiftUIHostingCollectionViewCell<Content: View>: UICollectionViewCell, Sel
             guard let content = swiftUIContentView else {
                 return
             }
+            
             let vc = UIHostingController(rootView: CellContent(cell: self) {
                 content
             })
@@ -43,6 +46,7 @@ class SwiftUIHostingCollectionViewCell<Content: View>: UICollectionViewCell, Sel
             self.contentView.addSubview(vc.view)
             self.contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|", metrics: nil, views: ["view" : vc.view as Any]))
             self.contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|", metrics: nil, views: ["view" : vc.view as Any]))
+            self.swiftUIContentViewController = vc
         }
     }
     
